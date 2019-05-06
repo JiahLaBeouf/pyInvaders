@@ -226,11 +226,12 @@ def main(winstyle = 0):
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
     Shot.images = [load_image('bullet.jpg')]
+    HomeBase.images = [load_image('homebase.gif')]
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
-    pygame.display.set_caption('Pygame Aliens')
+    pygame.display.set_caption('Jiah Presents: Aliens')
     pygame.mouse.set_visible(0)
 
     #create the background, tile the bgd image
@@ -253,6 +254,7 @@ def main(winstyle = 0):
     aliens = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     bombs = pygame.sprite.Group()
+    homeBase = pygame.sprite.Group()
     all = pygame.sprite.RenderUpdates()
     lastalien = pygame.sprite.GroupSingle()
 
@@ -263,6 +265,7 @@ def main(winstyle = 0):
     Bomb.containers = bombs, all
     Explosion.containers = all
     Score.containers = all
+    HomeBase.containers = all
 
     #Create Some Starting Values
     global score
