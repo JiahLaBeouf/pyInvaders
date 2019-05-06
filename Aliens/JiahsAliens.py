@@ -12,9 +12,9 @@ if not pygame.image.get_extended():
 
 
 #game constants
-MAX_SHOTS      = 100      #most player bullets onscreen
-ALIEN_ODDS     = 22     #chances a new alien appears
-BOMB_ODDS      = 60    #chances a new bomb will drop
+MAX_SHOTS      = 4      #most player bullets onscreen
+ALIEN_ODDS     = 0.1     #chances a new alien appears
+BOMB_ODDS      = 5    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
 SCREENRECT     = Rect(0, 0, 640, 480)
 SCORE          = 0
@@ -70,7 +70,7 @@ def load_sound(file):
 class Player(pygame.sprite.Sprite):
     speed = 10
     bounce = 24
-    gun_offset = -11
+    gun_offset = 0
     images = []
     def __init__(self):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -93,6 +93,24 @@ class Player(pygame.sprite.Sprite):
     def gunpos(self):
         pos = self.facing*self.gun_offset + self.rect.centerx
         return pos, self.rect.top
+
+class HomeBase(pygame.sprite.Sprite):
+    health = 10
+    images  = []
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self, self.containers)
+        self.image = self.images[0]
+        self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
+        self.reloading = 0
+        self.origtop = self.rect.top
+        self.facing = -1
+        self.health = 3
+
+    def update(self):
+        self.health = self.health - 1
+        self.image = self.images[self.health//self.animcycle%2]
+        if self.health <= 0: self.kill()
+
 
 
 class Alien(pygame.sprite.Sprite):
@@ -201,7 +219,7 @@ def main(winstyle = 0):
 
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
-    img = load_image('ship.png')
+    img = load_image('ship.gif')
     Player.images = [img, pygame.transform.flip(img, 1, 0)]
     img = load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
@@ -367,7 +385,7 @@ def main(winstyle = 0):
             maxShots = round(SCORE*0.1) + 4
         else:
             maxShots = 4
-        print(maxShots)
+        #print(maxShots)
 
 
         #draw the scene
