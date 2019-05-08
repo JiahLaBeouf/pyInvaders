@@ -13,8 +13,8 @@ if not pygame.image.get_extended():
 
 #game constants
 MAX_SHOTS      = 4      #most player bullets onscreen
-ALIEN_ODDS     = 0.1     #chances a new alien appears
-BOMB_ODDS      = 5    #chances a new bomb will drop
+ALIEN_ODDS     = 10     #chances a new alien appears
+BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
 SCREENRECT     = Rect(0, 0, 640, 480)
 SCORE          = 0
@@ -95,8 +95,10 @@ class Player(pygame.sprite.Sprite):
         return pos, self.rect.top
 
 class HomeBase(pygame.sprite.Sprite):
-    health = 10
-    images  = []
+    speed = 0
+    bounce = 24
+    gun_offset = 0
+    images = []
     def __init__(self):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
@@ -104,12 +106,20 @@ class HomeBase(pygame.sprite.Sprite):
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
-        self.health = 3
 
-    def update(self):
-        self.health = self.health - 1
-        self.image = self.images[self.health//self.animcycle%2]
-        if self.health <= 0: self.kill()
+    def move(self, direction):
+        if direction: self.facing = direction
+        self.rect.move_ip(direction*self.speed, 0)
+        self.rect = self.rect.clamp(SCREENRECT)
+        if direction < 0:
+            self.image = self.images[0]
+        elif direction > 0:
+            self.image = self.images[1]
+        self.rect.top = self.origtop - (self.rect.left//self.bounce%2)
+
+    def gunpos(self):
+        pos = self.facing*self.gun_offset + self.rect.centerx
+        return pos, self.rect.top
 
 
 
@@ -134,6 +144,7 @@ class Alien(pygame.sprite.Sprite):
             self.rect = self.rect.clamp(SCREENRECT)
         self.frame = self.frame + 1
         self.image = self.images[self.frame//self.animcycle%3]
+        #print("Alien Update called")
 
 
 class Explosion(pygame.sprite.Sprite):
@@ -226,7 +237,9 @@ def main(winstyle = 0):
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
     Shot.images = [load_image('bullet.jpg')]
-    HomeBase.images = [load_image('homebase.gif')]
+    img = load_image('player1.gif')
+    HomeBase.images = [img,pygame.transform.flip(img,1,0)]
+    print("HomeBase image loaded")
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
@@ -254,18 +267,19 @@ def main(winstyle = 0):
     aliens = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     bombs = pygame.sprite.Group()
-    homeBase = pygame.sprite.Group()
+    #homeBase = pygame.sprite.Group()
     all = pygame.sprite.RenderUpdates()
     lastalien = pygame.sprite.GroupSingle()
 
     #assign default groups to each sprite class
     Player.containers = all
     Alien.containers = aliens, all, lastalien
+    HomeBase.containers = all
     Shot.containers = shots, all
     Bomb.containers = bombs, all
     Explosion.containers = all
     Score.containers = all
-    HomeBase.containers = all
+    
 
     #Create Some Starting Values
     global score
@@ -273,12 +287,18 @@ def main(winstyle = 0):
     kills = 0
     clock = pygame.time.Clock()
 
+   #homeBase.position = 300,300
+    #print("homebase position called ")
+
     #initialize our starting sprites
     global SCORE
     player = Player()
     Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
+
+    homeBase = HomeBase()
+    print("homeBase=HomeBase()")
 
     #more self additions, the maxshots is for creating an increasing amount of bullets on the screen proportional to the score
     maxShots = 4
@@ -324,11 +344,14 @@ def main(winstyle = 0):
 
         #update all the sprites
         all.update()
+        homeBase.update()
 
         
         #handle player input
         direction = keystate[K_RIGHT] - keystate[K_LEFT]
         player.move(direction)
+        direction2 = keystate[K_UP] - keystate[K_DOWN]
+        homeBase.move(direction2)
         firing = keystate[K_SPACE]
         if not player.reloading and firing and len(shots) < maxShots:
             Shot(player.gunpos())
@@ -361,6 +384,12 @@ def main(winstyle = 0):
         for bomb in pygame.sprite.spritecollide(player, bombs, 1):
             boom_sound.play()
             Explosion(player)
+            Explosion(bomb)
+            #player.kill()
+
+        for bomb in pygame.sprite.spritecollide(homeBase, bombs, 1):
+            boom_sound.play()
+            Explosion(homeBase)
             Explosion(bomb)
             #player.kill()
 
