@@ -14,6 +14,7 @@ BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
 SCREENRECT     = Rect(0, 0, 700, 480)
 SCORE          = 0
+LIVES = 3
 
 #This directs the program to understand where to look for additional files
 main_dir = os.path.split(os.path.abspath(__file__))[0]
@@ -160,7 +161,7 @@ class Explosion(pygame.sprite.Sprite):
 
 
 class Shot(pygame.sprite.Sprite):
-    speed = -11
+    speed = -13
     images = []
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -174,7 +175,7 @@ class Shot(pygame.sprite.Sprite):
 
 
 class Bomb(pygame.sprite.Sprite):
-    speed = 9
+    speed = 11
     images = []
     def __init__(self, alien):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -206,21 +207,46 @@ class Score(pygame.sprite.Sprite):
             self.image = self.font.render(msg, 0, self.color)
 
 class Lives(pygame.sprite.Sprite):
+    #LIFE = 3
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.font = pygame.font.Font(None, 30)
         self.font.set_italic(1)
         self.color = Color('white')
-        self.lastscore = -1
+        self.lastlife = 4
         self.update()
-        self.rect = self.image.get_rect().move(10, 450)
+        #print("lives update called")
+        self.rect = self.image.get_rect().move(10, 420)
 
-#figure out the logic for this lives stuff because it's difficult and may need some revising
     def update(self):
-        if lives != self.lastscore:
-            self.lastscore = SCORE
-            msg = "Lives Remaining: %d" % lives
-            self.image = self.font.render(msg, 0, self.color)
+        if LIVES != self.lastlife:
+            self.lastlife = LIVES
+            msg2 = "Lives Remaining: %d" % LIVES
+            self.image = self.font.render(msg2, 0, self.color)
+            #print("in lives update")
+
+class Title(pygame.sprite.Sprite):
+    images = []
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = self.images[0]
+        self.rect = self.image.get_rect().move(350,400)
+
+class SelectableShip(pygame.sprite.Sprite):
+    images=[]
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image[0]
+        
+
+
+
+
+
+
+
+
+
 
 def main(winstyle = 0):
     # Initialize pygame
@@ -291,10 +317,12 @@ def main(winstyle = 0):
     Bomb.containers = bombs, all
     Explosion.containers = all
     Score.containers = all
+    Lives.containers = all
     
 
     #Create Some Starting Values
     global score
+    global lives
     alienreload = ALIEN_RELOAD
     kills = 0
     clock = pygame.time.Clock()
@@ -304,10 +332,12 @@ def main(winstyle = 0):
 
     #initialize our starting sprites
     global SCORE
+    global LIVES
     player = Player()
     Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
+        all.add(Lives())
 
     homeBase = HomeBase()
     print("homeBase=HomeBase()")
@@ -316,8 +346,10 @@ def main(winstyle = 0):
     maxShots = 4
     #the amount of lives a player begins with, the lives can only  be diminished by bombs, if an alien comes into contact then it is game over.
     lives = 3
+    #LIVES = lives
 
     while player.alive():
+        LIVES = lives
 
         #get input
         for event in pygame.event.get():
