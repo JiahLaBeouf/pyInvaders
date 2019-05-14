@@ -237,6 +237,9 @@ def main(winstyle = 0):
     bestdepth = pygame.display.mode_ok(SCREENRECT.size, winstyle, 32)
     screen = pygame.display.set_mode(SCREENRECT.size, winstyle, bestdepth)
 
+    #This should be where the start menu goes
+
+
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
     img = load_image('ship.gif')
@@ -402,6 +405,7 @@ def main(winstyle = 0):
             boom_sound.play()
             Explosion(homeBase)
             Explosion(bomb)
+            print("Homebase was hit")
             player.kill()
 
             #introduction of lives into the game
