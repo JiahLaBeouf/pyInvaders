@@ -14,7 +14,8 @@ BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
 SCREENRECT     = Rect(0, 0, 800, 550)
 SCORE          = 0
-LIVES = 3
+#LIVES = 3
+
 
 #This directs the program to understand where to look for additional files
 main_dir = os.path.split(os.path.abspath(__file__))[0]
@@ -36,8 +37,9 @@ def load_images(*files):
         imgs.append(load_image(file))
     return imgs
 
-def printText(font, x, y, text, color=(255,255,255)):
-    imgText = font.render(text, True, color)
+def printText(x, y, text,screen):
+    font = pygame.font.Font(None, 50)
+    imgText = font.render(text, True, (255,255,255))
     screen.blit(imgText, (x,y))
 
 class dummysound:
@@ -77,9 +79,9 @@ class Player(pygame.sprite.Sprite):
         self.origtop = self.rect.top
         self.facing = -1
 
-    def move(self, direction):
+    def move(self, direction,clockedSpeed):
         if direction: self.facing = direction
-        self.rect.move_ip(direction*self.speed, 0)
+        self.rect.move_ip(direction*self.speed*clockedSpeed, 0)
         self.rect = self.rect.clamp(SCREENRECT)
         if direction < 0:
             self.image = self.images[0]
@@ -180,8 +182,7 @@ class Bomb(pygame.sprite.Sprite):
     def __init__(self, alien):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
-        self.rect = self.image.get_rect(midbottom=
-                    alien.rect.move(0,5).midbottom)
+        self.rect = self.image.get_rect(midbottom=alien.rect.move(0,5).midbottom)
 
     def update(self):
         self.rect.move_ip(0, self.speed)
@@ -208,7 +209,7 @@ class Score(pygame.sprite.Sprite):
 
 class Lives(pygame.sprite.Sprite):
     #LIFE = 3
-    def __init__(self):
+    def __init__(self,lives):
         pygame.sprite.Sprite.__init__(self)
         self.font = pygame.font.Font(None, 30)
         self.font.set_italic(1)
@@ -219,9 +220,9 @@ class Lives(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(10, 420)
 
     def update(self):
-        if LIVES != self.lastlife:
-            self.lastlife = LIVES
-            msg2 = "Lives Remaining: %d" % LIVES
+        if lives != self.lastlife:
+            self.lastlife = lives
+            msg2 = "Lives Remaining: %d" % lives
             self.image = self.font.render(msg2, 0, self.color)
             #print("in lives update")
 
@@ -262,6 +263,8 @@ def main(winstyle = 0):
         print ('Warning, no sound')
         pygame.mixer = None
 
+    clock = pygame.time.Clock()
+    dt = clock.tick(800)
     fullscreen = False
     # Set the display mode
     winstyle = 0  # |FULLSCREEN
@@ -309,20 +312,26 @@ def main(winstyle = 0):
 
     #this loads the rainbow ship button (in the middle)
     rainbowShip = load_image("shipRainbow.gif")
-    xRShip = 302
-    yRShip = 150
+    xRShip = 352
+    yRShip = 200
     screen.blit(rainbowShip,(xRShip,yRShip))
     #pygame.display.flip()
 
     #This loads the pink ship button to the left
-    pinkShip = load_image("ship.gif")
-    xPShip = 202
-    yPShip = 150
+    pinkShip = load_image("shipSilver.gif")
+    xPShip = 252
+    yPShip = 200
     screen.blit(pinkShip,(xPShip,yPShip))
+
+    #This loads the green ship button to the right
+    greenShip = load_image("shipGreen.gif")
+    xGShip = 452
+    yGShip = 200
+    screen.blit(greenShip,(xGShip,yGShip))
 
     #Loads the title image
     title = load_image("titleGame.gif")
-    xtitle = 100; # x coordnate of image
+    xtitle = 150; # x coordnate of image
     ytitle = 30; # y coordinate of image
     screen.blit(title , (xtitle,ytitle)) # paint to screen
     
@@ -357,6 +366,9 @@ def main(winstyle = 0):
                     print("pink ship pressed")
                     shipType = 0
                     notClicked = False
+                elif xGShip<=x<=(xGShip+96) and yGShip<=y<=(yGShip+96):
+                    shipType = 2
+                    notClicked = False
 
 
     screen.blit(background, (0,0))
@@ -369,6 +381,8 @@ def main(winstyle = 0):
         imgP = load_image('ship.gif')
     elif shipType == 1:
         imgP = load_image('shipRainbow.gif')
+    elif shipType == 2:
+        imgP = load_image("shipGreen.gif")
     Player.images = [imgP, pygame.transform.flip(imgP, 1, 0)]
 
     #Loading later to make sure it loads under the player
@@ -405,14 +419,16 @@ def main(winstyle = 0):
    #homeBase.position = 300,300
     #print("homebase position called ")
 
+
+    lives = 3
     #initialize our starting sprites
     global SCORE
-    global LIVES
+    #global LIVES
     player = Player()
     Alien() #note, this 'lives' because it goes into a sprite group
     if pygame.font:
         all.add(Score())
-        all.add(Lives())
+        all.add(Lives(lives))
 
     homeBase = HomeBase()
     print("homeBase=HomeBase()")
@@ -420,12 +436,14 @@ def main(winstyle = 0):
     #more self additions, the maxshots is for creating an increasing amount of bullets on the screen proportional to the score
     maxShots = 4
     #the amount of lives a player begins with, the lives can only  be diminished by bombs, if an alien comes into contact then it is game over.
-    lives = 3
+    
     #LIVES = lives
     aliensDead=0
 
+    causeOfDeath = ""
+
     while player.alive():
-        LIVES = lives
+        #LIVES = lives
 
         #get input
         for event in pygame.event.get():
@@ -470,7 +488,7 @@ def main(winstyle = 0):
 
         #handle player input
         direction = keystate[K_RIGHT] - keystate[K_LEFT]
-        player.move(direction)
+        player.move(direction,dt)
         direction2 = keystate[K_UP] - keystate[K_DOWN]
         homeBase.move(direction2)
         firing = keystate[K_SPACE]
@@ -495,6 +513,10 @@ def main(winstyle = 0):
             Explosion(alien)
             Explosion(player)
             SCORE = SCORE + 1
+
+            screen.blit(background,(0,0))
+            pygame.time.wait(1000)
+
             player.kill()
 
         for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
@@ -517,6 +539,12 @@ def main(winstyle = 0):
             Explosion(homeBase)
             Explosion(bomb)
             print("Homebase was hit")
+            
+            print("Changing to windowed mode")
+
+            causeOfDeath = "Homebase was destroyed!"
+            screen.blit(background,(0,0))
+            pygame.time.wait(1000)
             player.kill()
 
             #introduction of lives into the game
@@ -537,6 +565,15 @@ def main(winstyle = 0):
 
 
         if lives==0:
+            screen.blit(background,(0,0))
+            pygame.time.wait(1000)
+            player.kill()
+
+        if keystate[K_k]:
+            screen.blit(background,(0,0))
+            pygame.display.flip()
+            pygame.time.wait(1000)
+
             player.kill()
 
             #The old formula for how many shots, however we may limit this to max 8
@@ -554,12 +591,49 @@ def main(winstyle = 0):
         #cap the framerate
         clock.tick(40)
 
+    #THIS is where the endgame goes
+    print("about to set to black")
+    screen.fill((0,0,0))
+    screen.blit(background, (0,0))
+    pygame.display.flip()
+    #pygame.display.update()
+    print("we've blitted the screen now")
+
+    button = load_image("ship.gif")
+    bx = 300
+    by = 300
+    screen.blit(button,(bx,by))
+
+    white = (255,255,255)
+    msg1 = "Cause of death: "+str(causeOfDeath)+""
+    print(msg1)
+    printText(100,200,msg1,screen)
+    pygame.display.flip()
+
+    pygame.mouse.set_visible(1)
+
+
+    replay = True
+    while replay == True:
+        
+        #print("in loop")
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+            # Set the x, y postions of the mouse click
+                x, y = event.pos
+    
+                #Why the fuck does this work and not the collidepoint?
+                if bx<=x<=(bx+button.get_width()) and by<=y<=(by+button.get_height()):
+                    print("statement true")
+                    
+                    replay = False
+
+
+
     if pygame.mixer:
         pygame.mixer.music.fadeout(1000)
     pygame.time.wait(1000)
-
-    #add the endgame sequence here! then loop back to main menu until quitted
-
 
     pygame.quit()
 
