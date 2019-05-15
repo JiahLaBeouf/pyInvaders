@@ -12,6 +12,7 @@ if not pygame.image.get_extended():
     raise SystemExit("Sorry, extended image module required")
 
 #call the "main" function if running this script
+
 main()
 
 # Some To Dos:
