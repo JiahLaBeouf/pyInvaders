@@ -237,7 +237,7 @@ class SelectableShip(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = image[0]
-        
+
 
 
 
@@ -263,7 +263,31 @@ def main(winstyle = 0):
     bestdepth = pygame.display.mode_ok(SCREENRECT.size, winstyle, 32)
     screen = pygame.display.set_mode(SCREENRECT.size, winstyle, bestdepth)
 
+    
+
     #This should be where the start menu goes
+    #Title.images = load_image("title.gif")
+    #print("title image loaded")
+
+    title = load_image("title.gif")
+
+    notClicked = True
+    x = 20; # x coordnate of image
+    y = 30; # y coordinate of image
+    screen.blit(title ,  ( x,y)) # paint to screen
+    pygame.display.flip() # paint screen one time
+
+    while (notClicked):
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+            # Set the x, y postions of the mouse click
+                x, y = event.pos
+                if title.get_rect().collidepoint(x, y):
+                    print('clicked on image')
+                    notClicked = False
+
+
+
 
 
     #Load images, assign to sprite classes
@@ -381,7 +405,7 @@ def main(winstyle = 0):
                     fullscreen = not fullscreen
 
 
-        keystate = pygame.key.get_pressed()
+        
 
         # clear/erase the last drawn sprites
         all.clear(screen, background)
@@ -390,6 +414,7 @@ def main(winstyle = 0):
         all.update()
         homeBase.update()
 
+        keystate = pygame.key.get_pressed()
         
         #handle player input
         direction = keystate[K_RIGHT] - keystate[K_LEFT]
@@ -478,5 +503,9 @@ def main(winstyle = 0):
     if pygame.mixer:
         pygame.mixer.music.fadeout(1000)
     pygame.time.wait(1000)
+
+    #add the endgame sequence here! then loop back to main menu until quitted
+
+
     pygame.quit()
 
