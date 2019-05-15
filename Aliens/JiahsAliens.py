@@ -23,3 +23,11 @@ main()
 #     End game section:
 #         1. links back to start menu or
 #         2. has an exit button which exits the game
+
+# Tasks for 15/05:
+#     new graphics for all buttons
+#     populate menus (starting + ending)
+#     new graphics for aliens, bullets, bombs, homebase
+#     create a health powerup? (basically copy bombs but for different purposes)
+#     create installation guide and user manual
+#     create survey
