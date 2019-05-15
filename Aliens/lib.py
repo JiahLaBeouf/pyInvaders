@@ -15,58 +15,7 @@ MAX_SHOTS      = 4      #most player bullets onscreen
 ALIEN_ODDS     = 10     #chances a new alien appears
 BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
-SCREENRECT     = Rect(0, 0, 800, 550)
-#SCORE          = 0
-#LIVES = 3
 
-
-#This directs the program to understand where to look for additional files
-main_dir = os.path.split(os.path.abspath(__file__))[0]
-
-#This function loads an image from the data folder in the classpath
-def load_image(file):
-    "loads an image, prepares it for play"
-    file = os.path.join(main_dir, 'data', file)
-    try:
-        surface = pygame.image.load(file)
-    except pygame.error:
-        raise SystemExit('Could not load image "%s" %s'%(file, pygame.get_error()))
-    return surface.convert()
-
-#This function loads multiple images from the data folder
-def load_images(*files):
-    imgs = []
-    for file in files:
-        imgs.append(load_image(file))
-    return imgs
-
-def printText(x, y, text,screen):
-    font = pygame.font.Font(None, 50)
-    imgText = font.render(text, True, (255,255,255))
-    screen.blit(imgText, (x,y))
-
-class dummysound:
-    def play(self): pass
-
-def load_sound(file):
-    if not pygame.mixer: return dummysound()
-    file = os.path.join(main_dir, 'data', file)
-    try:
-        sound = pygame.mixer.Sound(file)
-        return sound
-    except pygame.error:
-        print ('Warning, unable to load, %s' % file)
-    return dummysound()
-
-
-
-# each type of game object gets an init and an
-# update function. the update function is called
-# once per frame, and it is when each object should
-# change it's current position and state. the Player
-# object actually gets a "move" function instead of
-# update, since it is passed extra information about
-# the keyboard
 
 
 class Player(pygame.sprite.Sprite):
@@ -74,10 +23,12 @@ class Player(pygame.sprite.Sprite):
     bounce = 24
     gun_offset = 0
     images = []
-    def __init__(self):
+    sr = None
+    def __init__(self,scrt):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
-        self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
+        self.sr = scrt
+        self.rect = self.image.get_rect(midbottom=self.sr.midbottom)
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
@@ -85,7 +36,7 @@ class Player(pygame.sprite.Sprite):
     def move(self, direction,clockedSpeed):
         if direction: self.facing = direction
         self.rect.move_ip(direction*self.speed*clockedSpeed, 0)
-        self.rect = self.rect.clamp(SCREENRECT)
+        self.rect = self.rect.clamp(self.sr)
         if direction < 0:
             self.image = self.images[0]
         elif direction > 0:
@@ -101,10 +52,12 @@ class HomeBase(pygame.sprite.Sprite):
     bounce = 24
     gun_offset = 0
     images = []
-    def __init__(self):
+    sr = None
+    def __init__(self,scrt):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
-        self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
+        self.sr = scrt
+        self.rect = self.image.get_rect(midbottom=self.sr.midbottom)
         self.reloading = 0
         self.origtop = self.rect.top
         self.facing = -1
@@ -112,7 +65,7 @@ class HomeBase(pygame.sprite.Sprite):
     def move(self, direction):
         if direction: self.facing = direction
         self.rect.move_ip(direction*self.speed, 0)
-        self.rect = self.rect.clamp(SCREENRECT)
+        self.rect = self.rect.clamp(self.sr)
         if direction < 0:
             self.image = self.images[0]
         elif direction > 0:
@@ -129,21 +82,23 @@ class Alien(pygame.sprite.Sprite):
     speed = 13
     animcycle = 12
     images = []
-    def __init__(self,SCREENRECT):
+    sr = None
+    def __init__(self,scrt):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
+        self.sr = scrt
         self.rect = self.image.get_rect()
         self.facing = random.choice((-1,1)) * Alien.speed
         self.frame = 0
         if self.facing < 0:
-            self.rect.right = SCREENRECT.right
+            self.rect.right = self.sr.right
 
     def update(self):
         self.rect.move_ip(self.facing, 0)
-        if not SCREENRECT.contains(self.rect):
+        if not self.sr.contains(self.rect):
             self.facing = -self.facing;
             self.rect.top = self.rect.bottom + 1
-            self.rect = self.rect.clamp(SCREENRECT)
+            self.rect = self.rect.clamp(self.sr)
         self.frame = self.frame + 1
         self.image = self.images[self.frame//self.animcycle%3]
         #print("Alien Update called")
@@ -189,7 +144,7 @@ class Bomb(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.move_ip(0, self.speed)
-        if self.rect.bottom >= 500:
+        if self.rect.bottom >= 540:
             Explosion(self)
             self.kill()
 
@@ -407,13 +362,13 @@ def main(winstyle = 0):
         #initialize our starting sprites
         score = 0
         #global LIVES
-        player = Player()
+        player = Player(screenRect)
         Alien(screenRect) #note, this 'lives' because it goes into a sprite group
         if pygame.font:
             all.add(Score(score))
             all.add(Lives(lives))
 
-        homeBase = HomeBase()
+        homeBase = HomeBase(screenRect)
         print("homeBase=HomeBase()")
 
         #more self additions, the maxshots is for creating an increasing amount of bullets on the screen proportional to the score
