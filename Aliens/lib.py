@@ -12,7 +12,7 @@ MAX_SHOTS      = 4      #most player bullets onscreen
 ALIEN_ODDS     = 10     #chances a new alien appears
 BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
-SCREENRECT     = Rect(0, 0, 700, 480)
+SCREENRECT     = Rect(0, 0, 800, 550)
 SCORE          = 0
 LIVES = 3
 
@@ -65,7 +65,7 @@ def load_sound(file):
 
 
 class Player(pygame.sprite.Sprite):
-    speed = 10
+    speed = 15
     bounce = 24
     gun_offset = 0
     images = []
@@ -161,7 +161,7 @@ class Explosion(pygame.sprite.Sprite):
 
 
 class Shot(pygame.sprite.Sprite):
-    speed = -13
+    speed = -15
     images = []
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -185,7 +185,7 @@ class Bomb(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.move_ip(0, self.speed)
-        if self.rect.bottom >= 470:
+        if self.rect.bottom >= 500:
             Explosion(self)
             self.kill()
 
@@ -236,16 +236,21 @@ class SelectableShip(pygame.sprite.Sprite):
     images=[]
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = image[0]
+        self.image = self.images[0]
+        self.rect = self.image.get_rect().move(302,150)
 
+class Button(pygame.sprite.Sprite):
+    def __init__(self, image, buttonX, buttonY):
+        super().__init__()
+        
+        self.image = image  # It's usually good to have a reference to your image.
+        self.rect = image.get_rect()
 
-
-
-
-
-
-
-
+    def wasClicked(self, event):
+        if self.rect.collidepoint(event.pos):
+             return True
+        else:
+            return False
 
 
 def main(winstyle = 0):
@@ -263,51 +268,23 @@ def main(winstyle = 0):
     bestdepth = pygame.display.mode_ok(SCREENRECT.size, winstyle, 32)
     screen = pygame.display.set_mode(SCREENRECT.size, winstyle, bestdepth)
 
-    
-
-    #This should be where the start menu goes
-    #Title.images = load_image("title.gif")
-    #print("title image loaded")
-
-    title = load_image("title.gif")
-
-    notClicked = True
-    x = 20; # x coordnate of image
-    y = 30; # y coordinate of image
-    screen.blit(title ,  ( x,y)) # paint to screen
-    pygame.display.flip() # paint screen one time
-
-    while (notClicked):
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-            # Set the x, y postions of the mouse click
-                x, y = event.pos
-                if title.get_rect().collidepoint(x, y):
-                    print('clicked on image')
-                    notClicked = False
-
-
-
-
-
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
-    img = load_image('ship.gif')
-    Player.images = [img, pygame.transform.flip(img, 1, 0)]
+    
     img = load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
-    Shot.images = [load_image('bullet.jpg')]
-    img = load_image('player1.gif')
-    HomeBase.images = [img,pygame.transform.flip(img,1,0)]
-    print("HomeBase image loaded")
+    Shot.images = [load_image('shot.gif')]
+    
+
+    #SelectableShip.images = load_image("shipRainbow.gif")
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
     pygame.display.set_caption('Jiah Presents: Aliens')
-    pygame.mouse.set_visible(0)
+    
 
     #create the background, tile the bgd image
     bgdtile = load_image('hubbleimage.png')
@@ -324,6 +301,80 @@ def main(winstyle = 0):
         music = os.path.join(main_dir, 'data', 'house_lo.wav')
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(-1)
+
+
+    #This should be where the start menu goes
+    #Title.images = load_image("title.gif")
+    #print("title image loaded")
+
+    #this loads the rainbow ship button (in the middle)
+    rainbowShip = load_image("shipRainbow.gif")
+    xRShip = 302
+    yRShip = 150
+    screen.blit(rainbowShip,(xRShip,yRShip))
+    #pygame.display.flip()
+
+    #This loads the pink ship button to the left
+    pinkShip = load_image("ship.gif")
+    xPShip = 202
+    yPShip = 150
+    screen.blit(pinkShip,(xPShip,yPShip))
+
+    #Loads the title image
+    title = load_image("titleGame.gif")
+    xtitle = 100; # x coordnate of image
+    ytitle = 30; # y coordinate of image
+    screen.blit(title , (xtitle,ytitle)) # paint to screen
+    
+    pygame.display.flip() # paint screen one time
+
+    shipType = 0
+
+    notClicked = True
+    while (notClicked):
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+            # Set the x, y postions of the mouse click
+                x, y = event.pos
+                #mpos = pygame.mouse.get_pos()
+                #print(x,y,xRShip,(xRShip+rainbowShip.get_width()),yRShip,(yRShip+rainbowShip.get_height()))
+                if title.get_rect().collidepoint(x, y):
+                    print('clicked on title')
+                    #idk what to do with this one atm but maybe this will launch the github project?
+                    notClicked = False
+
+                #why does this not work???
+                # if rainbowShip.get_rect().collidepoint(x,y):
+                #     print("clicked on ship")
+                #     notClicked = False
+
+                #Why the fuck does this work and not the collidepoint?
+                if xRShip<=x<=(xRShip+rainbowShip.get_width()) and yRShip<=y<=(yRShip+rainbowShip.get_height()):
+                    print("3rd statement true")
+                    shipType = 1
+                    notClicked = False
+                elif xPShip <= x <= (xPShip+pinkShip.get_width()) and yPShip <= y <= (yPShip+pinkShip.get_width()):
+                    print("pink ship pressed")
+                    shipType = 0
+                    notClicked = False
+
+
+    screen.blit(background, (0,0))
+
+    #insert start game stuff here
+
+    pygame.mouse.set_visible(0)
+    #The ship files are loaded here so that the background and sounds can be initalized for the start menu
+    if shipType == 0:
+        imgP = load_image('ship.gif')
+    elif shipType == 1:
+        imgP = load_image('shipRainbow.gif')
+    Player.images = [imgP, pygame.transform.flip(imgP, 1, 0)]
+
+    #Loading later to make sure it loads under the player
+    img = load_image('player1.gif')
+    HomeBase.images = [img,pygame.transform.flip(img,1,0)]
+    print("HomeBase image loaded")
 
     # Initialize Game Groups
     aliens = pygame.sprite.Group()
@@ -371,6 +422,7 @@ def main(winstyle = 0):
     #the amount of lives a player begins with, the lives can only  be diminished by bombs, if an alien comes into contact then it is game over.
     lives = 3
     #LIVES = lives
+    aliensDead=0
 
     while player.alive():
         LIVES = lives
@@ -415,7 +467,7 @@ def main(winstyle = 0):
         homeBase.update()
 
         keystate = pygame.key.get_pressed()
-        
+
         #handle player input
         direction = keystate[K_RIGHT] - keystate[K_LEFT]
         player.move(direction)
@@ -447,7 +499,9 @@ def main(winstyle = 0):
 
         for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
             boom_sound.play()
-            Bomb(alien)
+            aliensDead+=1
+            if aliensDead%2==0:
+                Bomb(alien)
             Explosion(alien)
             SCORE = SCORE + 1
 
