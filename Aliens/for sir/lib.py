@@ -1,7 +1,7 @@
 #The location of all the classes and functions
 
 #additional import statements necessary for the program
-import random, os.path, sys
+import random, os.path
 
 import functions
 from functions import *
@@ -76,7 +76,6 @@ def main(winstyle = 0):
     bestdepth = pygame.display.mode_ok(screenRect.size, winstyle, 32)
     screen = pygame.display.set_mode(screenRect.size, winstyle, bestdepth)
     white = (255,255,255)
-    green = (23, 255, 15)
     
 
     #Load images, assign to sprite classes
@@ -121,10 +120,8 @@ def main(winstyle = 0):
         #Title.images = load_image("title.gif")
         #print("title image loaded")
 
-        printSCText(150,"Click on a ship to select it for gameplay",screen,green,45)
+        printCText(160,"Click on a ship to select it for gameplay",screen,white)
 
-        quitButton = placeImage("quitB.gif",352,470,screen)
-        printSCText(480,"Quit",screen,white,40)
 
         sY =200
         #this loads the rainbow ship button (in the middle)
@@ -177,11 +174,6 @@ def main(winstyle = 0):
                     elif xGShip<=x<=(xGShip+96) and sY<=y<=(sY+96):
                         shipType = 2
                         notClicked = False
-                    elif collideP(352,470,quitButton,x,y):
-                        pygame.quit()
-                        sys.exit(0)
-                        raise SystemExit
-                        return
 
 
         screen.blit(background, (0,0))
@@ -419,14 +411,11 @@ def main(winstyle = 0):
         by = 300
         screen.blit(button,(bx,by))
 
-        # button2 = load_image("shipSHIP.gif")
-        # bx2 = 500
-        # by2 = 300
-        # screen.blit(button,(bx2,by2))
-        # pygame.display.update()
-
-        quitButton = placeImage("quitB.gif",500,300,screen)
-        printText(510,300,"Quit",screen,white)
+        button2 = load_image("shipSHIP.gif")
+        bx2 = 500
+        by2 = 300
+        screen.blit(button,(bx2,by2))
+        pygame.display.update()
 
         printCText(120,"You scored "+str(score)+" points!",screen, white)
 
@@ -457,24 +446,16 @@ def main(winstyle = 0):
                     x, y = event.pos
                     print(x,y)
         
-                    # #Why the fuck does this work and not the collidepoint?
-                    # if bx<=x<=(bx+button.get_width()) and by<=y<=(by+button.get_height()):
-                    #     print("replay statement true")
+                    #Why the fuck does this work and not the collidepoint?
+                    if bx<=x<=(bx+button.get_width()) and by<=y<=(by+button.get_height()):
+                        print("replay statement true")
                         
-                    #     replay = False
+                        replay = False
 
-                    # if bx2<=x<=(bx2+button.get_width()) and by2<=y<=(by2+button.get_height()):
-                    #     print("end game statement true")
-                    #     playing = False
-                    #     replay = False
-
-                    if collideP(500,300,quitButton,x,y):
+                    if bx2<=x<=(bx2+button.get_width()) and by2<=y<=(by2+button.get_height()):
+                        print("end game statement true")
                         playing = False
                         replay = False
-                        pygame.quit()
-                        sys.exit(0)
-
-                    elif collideP()
 
 
 

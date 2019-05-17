@@ -27,10 +27,32 @@ def load_images(*files):
         imgs.append(load_image(file))
     return imgs
 
-def printText(x, y, text,screen):
-    font = pygame.font.Font(None, 50)
-    imgText = font.render(text, True, (255,255,255))
+def printCText(y, text,screen,colour):
+    font = pygame.font.Font("data/VT323-Regular.ttf", 50)
+    imgText = font.render(text, True,colour)
+    x = (800 - imgText.get_width())/2
     screen.blit(imgText, (x,y))
+    pygame.display.update()
+
+def printSCText(y, text,screen,colour,size):
+    font = pygame.font.Font("data/VT323-Regular.ttf", size)
+    imgText = font.render(text, True,colour)
+    x = (800 - imgText.get_width())/2
+    screen.blit(imgText, (x,y))
+    pygame.display.update()
+
+def printText(x,y, text,screen,colour):
+    font = pygame.font.Font("data/VT323-Regular.ttf", 50)
+    imgText = font.render(text, True,colour)
+    #x = (800 - imgText.get_width())/2
+    screen.blit(imgText, (x,y))
+    pygame.display.update()
+
+def placeImage(image,x,y,screen):
+	img = load_image(image)
+	screen.blit(img , (x,y))
+	pygame.display.update() # paint screen one time
+	return img
 
 class dummysound:
     def play(self): pass
@@ -44,4 +66,8 @@ def load_sound(file):
     except pygame.error:
         print ('Warning, unable to load, %s' % file)
     return dummysound()
+
+def collideP(xO,yO,object, x,y):
+	if xO<=x<=(xO+object.get_width()) and yO<=y<=(yO+object.get_height()):
+		return True
 
