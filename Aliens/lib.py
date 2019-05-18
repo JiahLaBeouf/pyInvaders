@@ -1,7 +1,7 @@
 #The location of all the classes and functions
 
 #additional import statements necessary for the program
-import random, os.path, sys
+import random, os.path, sys, webbrowser
 
 import functions
 from functions import *
@@ -156,9 +156,10 @@ def main(winstyle = 0):
                     #mpos = pygame.mouse.get_pos()
                     #print(x,y,xRShip,(xRShip+rainbowShip.get_width()),yRShip,(yRShip+rainbowShip.get_height()))
                     if title.get_rect().collidepoint(x, y):
-                        print('clicked on title')
                         #idk what to do with this one atm but maybe this will launch the github project?
-                        notClicked = False
+                        webbrowser.open_new("https://github.com/JiahLaBeouf/pyInvaders")
+
+                        #notClicked = False
 
                     #why does this not work???
                     # if rainbowShip.get_rect().collidepoint(x,y):
@@ -167,11 +168,9 @@ def main(winstyle = 0):
 
                     #Why the  does this work and not the collidepoint?
                     if xRShip<=x<=(xRShip+rainbowShip.get_width()) and sY<=y<=(sY+rainbowShip.get_height()):
-                        print("3rd statement true")
                         shipType = 1
                         notClicked = False
                     elif xPShip <= x <= (xPShip+silverShip.get_width()) and sY <= y <= (sY+silverShip.get_width()):
-                        print("pink ship pressed")
                         shipType = 0
                         notClicked = False
                     elif xGShip<=x<=(xGShip+96) and sY<=y<=(sY+96):
@@ -201,7 +200,6 @@ def main(winstyle = 0):
         #Loading later to make sure it loads under the player
         img = load_image('base.gif')
         HomeBase.images = [img,pygame.transform.flip(img,1,0)]
-        print("HomeBase image loaded")
 
         # Initialize Game Groups
         aliens = pygame.sprite.Group()
@@ -220,7 +218,6 @@ def main(winstyle = 0):
         Explosion.containers = all
         Score.containers = all
         Lives.containers = all
-        
 
         #Create Some Starting Values
         global score
@@ -228,10 +225,6 @@ def main(winstyle = 0):
         alienreload = ALIEN_RELOAD
         kills = 0
         clock = pygame.time.Clock()
-
-       #homeBase.position = 300,300
-        #print("homebase position called ")
-
 
         lives = 3
         #initialize our starting sprites
@@ -242,21 +235,15 @@ def main(winstyle = 0):
         if pygame.font:
             all.add(Score(score))
             all.add(Lives(lives))
-
         homeBase = HomeBase(screenRect)
-        print("homeBase=HomeBase()")
 
-        #more self additions, the maxshots is for creating an increasing amount of bullets on the screen proportional to the score
         maxShots = 4
-        #the amount of lives a player begins with, the lives can only  be diminished by bombs, if an alien comes into contact then it is game over.
         
-        #LIVES = lives
         aliensDead=0
 
         causeOfDeath = 0
 
         while player.alive():
-            #LIVES = lives
 
             #get input
             for event in pygame.event.get():
@@ -414,10 +401,10 @@ def main(winstyle = 0):
         #pygame.display.update()
         print("we've blitted the screen now")
 
-        button = load_image("ship.gif")
-        bx = 300
-        by = 300
-        screen.blit(button,(bx,by))
+        # button = load_image("ship.gif")
+        # bx = 300
+        # by = 300
+        # screen.blit(button,(bx,by))
 
         # button2 = load_image("shipSHIP.gif")
         # bx2 = 500
@@ -425,10 +412,30 @@ def main(winstyle = 0):
         # screen.blit(button,(bx2,by2))
         # pygame.display.update()
 
-        quitButton = placeImage("quitB.gif",500,300,screen)
-        printText(510,300,"Quit",screen,white)
+        menuButton = placeImage("mainMenu.gif",325,300,screen)
+        printSCText(310,"Main Menu",screen,white,40)
 
-        printCText(120,"You scored "+str(score)+" points!",screen, white)
+        quitButton = placeImage("quitB.gif",352,400,screen)
+        printCText(400,"Quit",screen,white)
+
+        printCText(60,"You scored "+str(score)+" points!",screen, white)
+
+        text_entry = ''
+
+        error = False
+    
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_BACKSPACE:
+                        text_entry = text_entry[:-1]
+                    elif event.key == K_RETURN:
+                        pass
+                    else:
+                        text_entry += event.unicode
 
         
         if causeOfDeath == 1:
@@ -439,48 +446,33 @@ def main(winstyle = 0):
             msg1 = "Cause of death: k pressed!"
         else:
             msg1 = "unknown cause of death"
-        print(msg1)
-        printCText(200,msg1,screen,white)
-        #pygame.display.update()
-
+        printCText(120,msg1,screen,white)
+        
         pygame.mouse.set_visible(1)
-
 
         replay = True
         while replay == True:
-            
-            #print("in loop")
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                 # Set the x, y postions of the mouse click
                     x, y = event.pos
-                    print(x,y)
-        
-                    # #Why the fuck does this work and not the collidepoint?
-                    # if bx<=x<=(bx+button.get_width()) and by<=y<=(by+button.get_height()):
-                    #     print("replay statement true")
-                        
-                    #     replay = False
 
-                    # if bx2<=x<=(bx2+button.get_width()) and by2<=y<=(by2+button.get_height()):
-                    #     print("end game statement true")
-                    #     playing = False
-                    #     replay = False
-
-                    if collideP(500,300,quitButton,x,y):
+                    if collideP(352,400,quitButton,x,y):
+                        # pygame.quit()
+                        # sys.exit(0)
                         playing = False
                         replay = False
-                        pygame.quit()
-                        sys.exit(0)
+                        
 
-                    elif collideP()
+                    elif collideP(325,300,menuButton,x,y):
+                        replay = False
 
 
 
     if pygame.mixer:
         pygame.mixer.music.fadeout(1000)
-    pygame.time.wait(1000)
+    #pygame.time.wait(1000)
 
     pygame.quit()
 
