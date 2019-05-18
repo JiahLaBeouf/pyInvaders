@@ -8,7 +8,7 @@ Usage:
 from setuptools import setup
 
 APP = ['JiahsAliens.py']
-DATA_FILES = ["lib.py","data"]
+DATA_FILES = ["lib.py","functions.py","classes.py","data"]
 OPTIONS = {}
 
 setup(
