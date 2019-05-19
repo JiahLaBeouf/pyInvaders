@@ -182,6 +182,19 @@ def main(winstyle = 0):
                         raise SystemExit
                         return
 
+        sc1 = load_image("controls.gif")
+
+        clearScreenBG(screen,background)
+
+        clearScreenBG(screen,sc1)
+
+        clicked = False
+        while not clicked:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                
+                    clicked = True
+
 
         screen.blit(background, (0,0))
 
