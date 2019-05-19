@@ -1,0 +1,1 @@
+Welcome to PyInvaders, the pygame project inspired by the legendary space invaders game! In this game, players select their ship to destroy the aliens in an attempt to save their home base! The Aliens will fight hard however, 
