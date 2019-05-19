@@ -94,7 +94,7 @@ def main(winstyle = 0):
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
-    pygame.display.set_caption('Jiah Presents: Aliens')
+    pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.0)')
     
 
     #create the background, tile the bgd image
