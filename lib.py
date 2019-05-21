@@ -87,6 +87,7 @@ def main(winstyle = 0):
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
     Shot.images = [load_image('shot.gif')]
+    Health.images = [load_image('health.png')]
     
 
     #SelectableShip.images = load_image("shipRainbow.gif")
@@ -107,9 +108,9 @@ def main(winstyle = 0):
 
     #load the sound effects
     boom_sound = load_sound('boom.wav')
-    shoot_sound = load_sound('car_door.wav')
+    shoot_sound = load_sound('laserSound.wav')
     if pygame.mixer:
-        music = os.path.join(main_dir, 'data', 'house_lo.wav')
+        music = os.path.join(main_dir, 'data', 'music.wav')
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(-1)
 
@@ -214,10 +215,12 @@ def main(winstyle = 0):
         img = load_image('base.gif')
         HomeBase.images = [img,pygame.transform.flip(img,1,0)]
 
+
         # Initialize Game Groups
         aliens = pygame.sprite.Group()
         shots = pygame.sprite.Group()
         bombs = pygame.sprite.Group()
+        healths = pygame.sprite.Group()
         #homeBase = pygame.sprite.Group()
         all = pygame.sprite.RenderUpdates()
         lastalien = pygame.sprite.GroupSingle()
@@ -231,6 +234,7 @@ def main(winstyle = 0):
         Explosion.containers = all
         Score.containers = all
         Lives.containers = all
+        Health.containers = healths, all
 
         #Create Some Starting Values
         global score
@@ -338,6 +342,8 @@ def main(winstyle = 0):
                 if aliensDead%2==0:
                     Bomb(alien)
                 Explosion(alien)
+                if aliensDead%10 == 0:
+                    Health(alien)
                 score += 1
 
             for bomb in pygame.sprite.spritecollide(player, bombs, 1):
@@ -346,6 +352,11 @@ def main(winstyle = 0):
                 Explosion(bomb)
                 #player.kill()
                 lives-=1
+
+            for health in pygame.sprite.spritecollide(player,healths,1):
+                lives +=1
+                health.kill()
+                #play health up sound
 
             for bomb in pygame.sprite.spritecollide(homeBase, bombs, 1):
                 boom_sound.play()
@@ -390,14 +401,6 @@ def main(winstyle = 0):
                 causeOfDeath = 3
 
                 player.kill()
-
-                #The old formula for how many shots, however we may limit this to max 8
-            # if SCORE>=10:
-            #     maxShots = round(SCORE*0.1) + 4
-            # else:
-            #     maxShots = 4
-            # #print(maxShots)
-
 
             #draw the scene
             dirty = all.draw(screen)
