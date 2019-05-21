@@ -29,12 +29,32 @@ class Score(pygame.sprite.Sprite):
         self.color = Color('white')
         self.lastscore = -1
         self.update()
+
         self.rect = self.image.get_rect().move(10, 450)
 
     def update(self):
         if score != self.lastscore:
             self.lastscore = score
             msg = "Score: %d" % score
+            self.image = self.font.render(msg, 0, self.color)
+
+class Timer(pygame.sprite.Sprite):
+    #score = None
+    def __init__(self,inGameTime):
+        pygame.sprite.Sprite.__init__(self)
+        #self.score = score
+        self.font = pygame.font.Font(None, 50)
+        self.font.set_italic(1)
+        self.color = Color('white')
+        self.lasttime = -1
+        self.update()
+        self.width = self.image.get_width()
+        self.rect = self.image.get_rect().move(((800-self.width)/2), 20)
+
+    def update(self):
+        if self.lasttime != inGameTime:
+            self.lasttime = inGameTime
+            msg = "Time: %d" % inGameTime
             self.image = self.font.render(msg, 0, self.color)
 
 class Lives(pygame.sprite.Sprite):
@@ -86,7 +106,7 @@ def main(winstyle = 0):
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [load_image('bomb.gif')]
-    Shot.images = [load_image('shot.gif')]
+    Shot.images = [load_image('shot.png')]
     Health.images = [load_image('health.png')]
     
 
@@ -95,7 +115,7 @@ def main(winstyle = 0):
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
-    pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.0)')
+    pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.1)')
     
 
     #create the background, tile the bgd image
@@ -109,8 +129,9 @@ def main(winstyle = 0):
     #load the sound effects
     boom_sound = load_sound('boom.wav')
     shoot_sound = load_sound('laserSound.wav')
+    #healthSound = load_sound('powerUp1.wav')
     if pygame.mixer:
-        music = os.path.join(main_dir, 'data', 'music.wav')
+        music = os.path.join(main_dir, 'data', 'gameMusic2.wav')
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(-1)
 
@@ -234,16 +255,20 @@ def main(winstyle = 0):
         Explosion.containers = all
         Score.containers = all
         Lives.containers = all
+        Timer.containers = all
         Health.containers = healths, all
 
         #Create Some Starting Values
         global score
+        global inGameTime
         global lives
-        alienreload = ALIEN_RELOAD
+        framesPerAlien = ALIEN_RELOAD
         kills = 0
         clock = pygame.time.Clock()
 
         lives = 3
+
+        inGameTime = 0
         #initialize our starting sprites
         score = 0
         #global LIVES
@@ -252,6 +277,7 @@ def main(winstyle = 0):
         if pygame.font:
             all.add(Score(score))
             all.add(Lives(lives))
+            all.add(Timer(inGameTime))
         homeBase = HomeBase(screenRect)
 
         maxShots = 4
@@ -260,7 +286,15 @@ def main(winstyle = 0):
 
         causeOfDeath = 0
 
+        startTime = pygame.time.get_ticks()
+
         while player.alive():
+
+            inGameTime = round(((pygame.time.get_ticks()) - startTime)/1000)
+
+            alienReload = 6/((inGameTime/10)+0.001)
+
+            #printSCText(20,str(inGameTime),screen,white,50)
 
             #get input
             for event in pygame.event.get():
@@ -315,11 +349,11 @@ def main(winstyle = 0):
             player.reloading = firing
 
             # Create new alien
-            if alienreload:
-                alienreload = alienreload - 1
+            if framesPerAlien:
+                framesPerAlien = framesPerAlien - 1
             elif not int(random.random() * ALIEN_ODDS):
                 Alien(screenRect)
-                alienreload = ALIEN_RELOAD
+                framesPerAlien = ALIEN_RELOAD
             # Drop bombs
             if lastalien and not int(random.random() * BOMB_ODDS):
                 Bomb(lastalien.sprite)
@@ -354,8 +388,10 @@ def main(winstyle = 0):
                 lives-=1
 
             for health in pygame.sprite.spritecollide(player,healths,1):
+                #healthSound.play()
                 lives +=1
                 health.kill()
+
                 #play health up sound
 
             for bomb in pygame.sprite.spritecollide(homeBase, bombs, 1):
@@ -488,7 +524,7 @@ def main(winstyle = 0):
 
     if pygame.mixer:
         pygame.mixer.music.fadeout(1000)
-    #pygame.time.wait(1000)
+    pygame.time.wait(1000)
 
     pygame.quit()
 
