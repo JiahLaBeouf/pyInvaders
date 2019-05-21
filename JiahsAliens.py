@@ -13,7 +13,7 @@ if not pygame.image.get_extended():
 
 #call the "main" function if running this script
 
-#Welcome to PyInvaders version 1.0
+#Welcome to PyInvaders version 1.1
 
 main()
 

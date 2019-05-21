@@ -292,7 +292,12 @@ def main(winstyle = 0):
 
             inGameTime = round(((pygame.time.get_ticks()) - startTime)/1000)
 
-            alienReload = 6/((inGameTime/10)+0.001)
+
+            #adding increasing difficulty
+            alienReload = round(6/((inGameTime/10)+0.001))
+            if inGameTime<=10:
+                alienReload = 6
+            print(alienReload)
 
             #printSCText(20,str(inGameTime),screen,white,50)
 
@@ -353,7 +358,7 @@ def main(winstyle = 0):
                 framesPerAlien = framesPerAlien - 1
             elif not int(random.random() * ALIEN_ODDS):
                 Alien(screenRect)
-                framesPerAlien = ALIEN_RELOAD
+                framesPerAlien = alienReload
             # Drop bombs
             if lastalien and not int(random.random() * BOMB_ODDS):
                 Bomb(lastalien.sprite)
