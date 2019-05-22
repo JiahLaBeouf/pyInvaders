@@ -8,12 +8,12 @@ def clearScreenBG(s,bg):
 	s.blit(bg,(0,0))
 	pygame.display.flip()
 
-main_dir = os.path.split(os.path.abspath(__file__))[0]
+mainDir = os.path.split(os.path.abspath(__file__))[0]
 
 #This function loads an image from the data folder in the classpath
-def load_image(file):
+def loadImage(file):
     "loads an image, prepares it for play"
-    file = os.path.join(main_dir, 'data', file)
+    file = os.path.join(mainDir, 'data', file)
     try:
         surface = pygame.image.load(file)
     except pygame.error:
@@ -21,10 +21,10 @@ def load_image(file):
     return surface.convert()
 
 #This function loads multiple images from the data folder
-def load_images(*files):
+def loadImages(*files):
     imgs = []
     for file in files:
-        imgs.append(load_image(file))
+        imgs.append(loadImage(file))
     return imgs
 
 def printCText(y, text,screen,colour):
@@ -49,7 +49,7 @@ def printText(x,y, text,screen,colour):
     pygame.display.update()
 
 def placeImage(image,x,y,screen):
-	img = load_image(image)
+	img = loadImage(image)
 	screen.blit(img , (x,y))
 	pygame.display.update() # paint screen one time
 	return img
@@ -57,9 +57,9 @@ def placeImage(image,x,y,screen):
 class dummysound:
     def play(self): pass
 
-def load_sound(file):
+def loadSound(file):
     if not pygame.mixer: return dummysound()
-    file = os.path.join(main_dir, 'data', file)
+    file = os.path.join(mainDir, 'data', file)
     try:
         sound = pygame.mixer.Sound(file)
         return sound

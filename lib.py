@@ -101,12 +101,12 @@ def main(winstyle = 0):
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
     
-    img = load_image('explosion1.gif')
+    img = loadImage('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
-    Alien.images = load_images('alien1.gif', 'alien2.gif', 'alien3.gif')
-    Bomb.images = [load_image('bomb.gif')]
-    Shot.images = [load_image('shot.png')]
-    Health.images = [load_image('health.png')]
+    Alien.images = loadImages('alien1.gif', 'alien2.gif', 'alien3.gif')
+    Bomb.images = [loadImage('bomb.gif')]
+    Shot.images = [loadImage('shot.png')]
+    Health.images = [loadImage('health.png')]
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
@@ -114,7 +114,7 @@ def main(winstyle = 0):
     pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.1)')
 
     #create the background, tile the bgd image
-    bgdtile = load_image('hubbleimage.png')
+    bgdtile = loadImage('hubbleimage.png')
     background = pygame.Surface(screenRect.size)
     for x in range(0, screenRect.width, bgdtile.get_width()):
         background.blit(bgdtile, (x, 0))
@@ -122,21 +122,22 @@ def main(winstyle = 0):
     pygame.display.flip()
 
     #load the sound effects
-    boom_sound = load_sound('boom.wav')
-    shoot_sound = load_sound('laserSound.wav')
-    #healthSound = load_sound('powerUp1.wav')
+    boom_sound = loadSound('boom.wav')
+    shoot_sound = loadSound('laserSound.wav')
+    #healthSound = loadSound('powerUp1.wav')
     if pygame.mixer:
-        music = os.path.join(main_dir, 'data', 'gameMusic2.wav')
+        music = os.path.join(mainDir, 'data', 'gameMusic2.wav')
         pygame.mixer.music.load(music)
         pygame.mixer.music.play(-1)
 
     playing = True
 
+    tFile = open("leaderboard.txt",'r+')
+
+    
+
     while playing:
         clearScreenBG(screen,background)
-        #This should be where the start menu goes
-        #Title.images = load_image("title.gif")
-        #print("title image loaded")
 
         printSCText(150,"Click on a ship to select it for gameplay",screen,green,45)
 
@@ -145,7 +146,7 @@ def main(winstyle = 0):
 
         sY =200
         #this loads the rainbow ship button (in the middle)
-        rainbowShip = load_image("shipRainbow.gif")
+        rainbowShip = loadImage("shipRainbow.gif")
         xRShip = 352
         yRShip = 200
         screen.blit(rainbowShip,(xRShip,yRShip))
@@ -164,6 +165,46 @@ def main(winstyle = 0):
         
         shipType = 0
 
+        names = []
+        scores = []
+        tFile = open("leaderboard.txt",'r+')
+        list = tFile.read().splitlines()
+        iterator = True
+        i=int(0)
+        ender = len(list)-1
+        while iterator:
+            name,scorez = list.pop(0).split("|")
+            names.append(name)
+            scores.append(int(scorez))
+            i = i+1
+            #print(i)
+            if i>ender:
+                iterator = False
+            else:
+                x = 1
+
+        n = len(scores)
+
+        for i in range(n):
+         
+            # Last i elements are already in place
+            for j in range(0, n-i-1):
+     
+                # traverse the array from 0 to n-i-1
+                # Swap if the element found is greater
+                # than the next element
+                if scores[j] < scores[j+1] :
+                    scores[j], scores[j+1] = scores[j+1], scores[j]
+                    names[j],names[j+1]=names[j+1],names[j]
+
+        msgLB1 = names[0]+": "+str(scores[0])
+        msgLB2 = names[1]+": "+str(scores[1])
+        msgLB3 = names[2]+": "+str(scores[2])
+
+        printCText(310,"HIGH SCORES",screen,green)
+        printSCText(360,msgLB1,screen,white,30)
+        printSCText(390,msgLB2,screen,white,30)
+        printSCText(420,msgLB3,screen,white,30)
 
         notClicked = True
         while (notClicked):
@@ -232,7 +273,7 @@ def main(winstyle = 0):
 
         #This is where the difficulty selector should go
 
-        sc1 = load_image("controls.gif")
+        sc1 = loadImage("controls.gif")
 
         clearScreenBG(screen,background)
 
@@ -253,15 +294,15 @@ def main(winstyle = 0):
         pygame.mouse.set_visible(0)
         #The ship files are loaded here so that the background and sounds can be initalized for the start menu
         if shipType == 0:
-            imgP = load_image('shipSilver.gif')
+            imgP = loadImage('shipSilver.gif')
         elif shipType == 1:
-            imgP = load_image('shipRainbow.gif')
+            imgP = loadImage('shipRainbow.gif')
         elif shipType == 2:
-            imgP = load_image("shipGreen.gif")
+            imgP = loadImage("shipGreen.gif")
         Player.images = [imgP, pygame.transform.flip(imgP, 1, 0)]
 
         #Loading later to make sure it loads under the player
-        img = load_image('base.gif')
+        img = loadImage('base.gif')
         HomeBase.images = [img,pygame.transform.flip(img,1,0)]
 
 
@@ -505,17 +546,6 @@ def main(winstyle = 0):
         #pygame.display.update()
         print("we've blitted the screen now")
 
-        # button = load_image("ship.gif")
-        # bx = 300
-        # by = 300
-        # screen.blit(button,(bx,by))
-
-        # button2 = load_image("shipSHIP.gif")
-        # bx2 = 500
-        # by2 = 300
-        # screen.blit(button,(bx2,by2))
-        # pygame.display.update()
-
         menuButton = placeImage("mainMenu.gif",325,300,screen)
         printSCText(310,"Main Menu",screen,white,40)
 
@@ -523,7 +553,6 @@ def main(winstyle = 0):
         printCText(400,"Quit",screen,white)
 
         printCText(60,"You scored "+str(score)+" points!",screen, white)
-
         
         if causeOfDeath == 1:
             msg1 = "Cause of death: Homebase was destroyed!"
@@ -537,10 +566,29 @@ def main(winstyle = 0):
         
         pygame.mouse.set_visible(1)
 
-        
+        textEntry = ''
+
+        # error = False
+    
+        # while True:
+        #     for event in pygame.event.get():
+        #         if event.type == QUIT:
+        #             pygame.quit()
+        #             sys.exit()
+        #         if event.type == KEYDOWN:
+        #             if event.key == K_BACKSPACE:
+        #                 text_entry = text_entry[:-1]
+        #             elif event.key == K_RETURN:
+        #                 pass
+        #             else:
+        #                 text_entry += event.unicode
+
+        printCText(200,"Enter Name:            ",screen,green)
 
         replay = True
         while replay == True:
+
+            printText(400,200,textEntry,screen,white)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -556,6 +604,17 @@ def main(winstyle = 0):
 
                     elif collideP(325,300,menuButton,x,y):
                         replay = False
+                elif event.type == KEYDOWN:
+                    if event.key == K_BACKSPACE:
+                        textEntry = text_entry[:-1]
+                    elif event.key == K_RETURN:
+                        pass
+                    else:
+                        textEntry += event.unicode
+
+        nameW = str(textEntry)
+
+        tFile.write("\n"+nameW+"|"+str(score))
 
 
 
