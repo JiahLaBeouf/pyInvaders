@@ -106,7 +106,7 @@ def main(winstyle = 0):
     Alien.images = loadImages('alien1.gif', 'alien2.gif', 'alien3.gif')
     Bomb.images = [loadImage('bomb.gif')]
     Shot.images = [loadImage('shot.png')]
-    Health.images = [loadImage('health.png')]
+    Health.images = [loadImage('health.gif')]
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
@@ -243,14 +243,19 @@ def main(winstyle = 0):
 
         clearScreenBG(screen,background)
 
-        easy = placeImage("easy.gif",226,200,screen)
-        printText(228,205,"Easy",screen,white)
 
-        medium = placeImage("medium.gif",352,200,screen)
+        printSCText(80,"Select Game Difficulty",screen,green,75)
+
+        printSCText(400,"Game controls will appear once difficulty selected",screen,white,30)
+
+        easy = placeImage("easy.gif",216,200,screen)
+        printText(218,205,"Easy",screen,white)
+
+        medium = placeImage("medium.png",340,200,screen)
         printCText(205,"Medium",screen,white)
 
-        hard = placeImage("hard.gif",478,200,screen)
-        printText(480,205,"Hard",screen,white)
+        hard = placeImage("hard.gif",488,200,screen)
+        printText(490,205,"Hard",screen,white)
 
         difficulty = None
 
