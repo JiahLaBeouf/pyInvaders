@@ -126,7 +126,7 @@ def _run():
     exec(compile(source, script, 'exec'), globals(), globals())
 
 
-DEFAULT_SCRIPT='/Users/jiahpang/Github/pyInvaders/JiahsAliens.py'
+DEFAULT_SCRIPT='/Users/jiahpang/Github/pyInvaders/PyInvaders.py'
 SCRIPT_MAP={}
 try:
     _run()

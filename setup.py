@@ -5,10 +5,11 @@ Usage:
     python setup.py py2app
 """
 
+
 from setuptools import setup
 
-APP = ['JiahsAliens.py']
-DATA_FILES = ["lib.py","functions.py","classes.py","data","leaderboard.txt"]
+APP = ['PyInvaders.py']
+DATA_FILES = ["lib.py","classes.py","functions.py","leaderboard.txt","data"]
 OPTIONS = {}
 
 setup(

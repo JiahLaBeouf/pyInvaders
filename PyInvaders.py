@@ -1,4 +1,4 @@
-#JiahsAliens.py (essentially the main file)
+#PyInvaders.py (essentially the main file)
 
 import lib
 from lib import *

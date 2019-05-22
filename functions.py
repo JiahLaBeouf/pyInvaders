@@ -53,6 +53,12 @@ def placeImage(image,x,y,screen):
 	screen.blit(img , (x,y))
 	pygame.display.update() # paint screen one time
 	return img
+def placeCImage(image,y,screen):
+	img = loadImage(image)
+	x = (800-img.get_width())/2
+	screen.blit(img,(x,y))
+	pygame.display.update()
+	return img
 
 class dummysound:
     def play(self): pass

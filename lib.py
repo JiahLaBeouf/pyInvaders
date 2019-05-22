@@ -161,7 +161,7 @@ def main(winstyle = 0):
         greenShip = placeImage("shipGreen.gif",xGShip,sY,screen)
 
         #Loads the title image
-        title = placeImage("titleGame.gif",150,30,screen)
+        title = placeCImage("title.gif",20,screen)
         
         shipType = 0
 
