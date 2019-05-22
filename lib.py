@@ -244,8 +244,10 @@ def main(winstyle = 0):
         clearScreenBG(screen,background)
 
 
+        #Starting the layout for the game difficulty screen
+        
+        #Places the two independent captions
         printSCText(80,"Select Game Difficulty",screen,green,75)
-
         printSCText(400,"Game controls will appear once difficulty selected",screen,white,30)
 
         easy = placeImage("easy.gif",216,200,screen)
@@ -259,6 +261,8 @@ def main(winstyle = 0):
 
         difficulty = None
 
+        #This while loop is where the difficulty is determined
+        #This uses the self made collideP method to detect mouse clicks on objects.
         difficultyChoice = True
         while (difficultyChoice):
             for event in pygame.event.get():
@@ -266,24 +270,23 @@ def main(winstyle = 0):
                 # Set the x, y postions of the mouse click
                     x, y = event.pos
                     
-                    if 226<=x<=(226+96) and 200<=y<=(200+60):
+                    if collideP(216,200,easy,x,y):
                         difficulty = 0
                         difficultyChoice = False
-                    elif 352 <= x <= (352+96) and 200<=y<=(200+60):
+                    elif collideP(340,200,medium,x,y):
                         difficulty = 1
                         difficultyChoice = False
-                    elif 478<=x<=(478+96) and 200<=y<=(200+60):
+                    elif collideP(488,200,hard,x,y):
                         difficulty = 2
                         difficultyChoice = False
 
-        #This is where the difficulty selector should go
-
-        sc1 = loadImage("controls.gif")
-
         clearScreenBG(screen,background)
 
+        #This loads the control screen and blits to cover screen.
+        sc1 = loadImage("controls.gif")
         clearScreenBG(screen,sc1)
 
+        #This is the controls screen, which waits for a click anywhere, hence no collide methods.
         clicked = False
         while not clicked:
             for event in pygame.event.get():
@@ -292,12 +295,15 @@ def main(winstyle = 0):
                     clicked = True
 
 
-        screen.blit(background, (0,0))
+        clearScreenBG(screen,background)
 
-        #insert start game stuff here
-
+        #The mouse is now set invisible so that there is no interruption to gameplay
         pygame.mouse.set_visible(0)
-        #The ship files are loaded here so that the background and sounds can be initalized for the start menu
+
+        img = loadImage('base.gif')
+        HomeBase.images = [img,pygame.transform.flip(img,1,0)]
+
+        #The ship is now loaded based on earlier preference from the start menu.
         if shipType == 0:
             imgP = loadImage('shipSilver.gif')
         elif shipType == 1:
@@ -306,9 +312,7 @@ def main(winstyle = 0):
             imgP = loadImage("shipGreen.gif")
         Player.images = [imgP, pygame.transform.flip(imgP, 1, 0)]
 
-        #Loading later to make sure it loads under the player
-        img = loadImage('base.gif')
-        HomeBase.images = [img,pygame.transform.flip(img,1,0)]
+        
 
 
         # Initialize Game Groups
@@ -316,7 +320,6 @@ def main(winstyle = 0):
         shots = pygame.sprite.Group()
         bombs = pygame.sprite.Group()
         healths = pygame.sprite.Group()
-        #homeBase = pygame.sprite.Group()
         all = pygame.sprite.RenderUpdates()
         lastalien = pygame.sprite.GroupSingle()
 
@@ -332,69 +335,76 @@ def main(winstyle = 0):
         Timer.containers = all
         Health.containers = healths, all
 
-        #Create Some Starting Values
+        #Create Some Starting Values, as well as initialising global variables for the sprites during gameplay
         global score
         global inGameTime
         global lives
         framesPerAlien = ALIEN_RELOAD
         kills = 0
         clock = pygame.time.Clock()
-
         lives = 3
-
         inGameTime = 0
-        #initialize our starting sprites
         score = 0
-        #global LIVES
+
+        #Init starting sprites (or 'living sprites')
         player = Player(screenRect)
-        Alien(screenRect) #note, this 'lives' because it goes into a sprite group
+        Alien(screenRect) #this 'lives' because it goes into a sprite group
+
+        #adding the value sprites to the game screen
         if pygame.font:
             all.add(Score(score))
             all.add(Lives(lives))
             all.add(Timer(inGameTime))
+
+        #adding the homebase, passes in the screen so it can determine it's staring position.
         homeBase = HomeBase(screenRect)
 
+        #This has the potential to be proportional to the score if more challenge is required
         maxShots = 4
         
         aliensDead=0
 
+        #Used later, in the endgame menu
         causeOfDeath = 0
 
         startTime = pygame.time.get_ticks()
 
+        #This loop is essentially the gameplay loop. It ends whenever the player is killed
         while player.alive():
 
             inGameTime = round(((pygame.time.get_ticks()) - startTime)/1000)
 
 
-            #adding increasing difficulty
-            #
+            #Increasing difficulty rate here. Uses the time to determine how many aliens spawn and when
             
+            #Easy difficulty. Never changes, this has room for improvement
             if difficulty == 0:
                 if inGameTime<=10:
                     alienReload = 7
                 
+            #Medium difficulty
             elif difficulty == 1:
                 if inGameTime<=10:
                     alienReload = 6
                 elif 10<=inGameTime<=120:
+                    #This specific range is due to the divisor, to avoid rounding to zero.
                     alienReload = round(6/((inGameTime/10)+0.001))
                 else:
                     alienReload = 2
+
+            #Hard difficulty
             elif difficulty == 2:
                 if inGameTime<=10:
                     alienReload = 6
                 elif 10<=inGameTime<=70:
+                    #This specific range is due to the divisor, to avoid rounding to zero.
                     alienReload = round(6/(inGameTime/6)+0.01)
                 else:
                     alienReload = 1
 
-            #print(alienReload)
+            
 
-
-            #printSCText(20,str(inGameTime),screen,white,50)
-
-            #get input
+            #get input to determine quitting application or changing to fullscreen. May depreciate this.
             for event in pygame.event.get():
                 if event.type == QUIT or \
                     (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -435,11 +445,15 @@ def main(winstyle = 0):
 
             keystate = pygame.key.get_pressed()
 
-            #handle player input
+            #handle player input to determine character movement.
             direction = keystate[K_RIGHT] - keystate[K_LEFT]
             player.move(direction,dt)
+
+            #This is incase of 2 player and/or random movement, currently homebase has 0 velocity but this could change in the future
             direction2 = keystate[K_UP] - keystate[K_DOWN]
             homeBase.move(direction2)
+
+            #The firing code
             firing = keystate[K_SPACE]
             if not player.reloading and firing and len(shots) < maxShots:
                 Shot(player.gunpos())
@@ -447,9 +461,13 @@ def main(winstyle = 0):
             player.reloading = firing
 
             # Create new alien
-            if framesPerAlien:
+
+            odds = int(random.random() * ALIEN_ODDS)
+
+            if framesPerAlien>=0:
                 framesPerAlien = framesPerAlien - 1
-            elif not int(random.random() * ALIEN_ODDS):
+            elif odds ==0:
+                #This basically gives the odds of an alien showing up.
                 Alien(screenRect)
                 framesPerAlien = alienReload
             # Drop bombs
@@ -457,6 +475,8 @@ def main(winstyle = 0):
                 Bomb(lastalien.sprite)
 
             # Detect collisions
+
+            #This is for if an alien reaches a player, which results in instant death.
             for alien in pygame.sprite.spritecollide(player, aliens, 1):
                 boom_sound.play()
                 Explosion(alien)
@@ -468,6 +488,7 @@ def main(winstyle = 0):
 
                 player.kill()
 
+            #Bullet and alien collision
             for alien in pygame.sprite.groupcollide(shots, aliens, 1, 1).keys():
                 boom_sound.play()
                 aliensDead+=1
@@ -478,6 +499,7 @@ def main(winstyle = 0):
                     Health(alien)
                 score += 1
 
+            #bomb hitting player
             for bomb in pygame.sprite.spritecollide(player, bombs, 1):
                 boom_sound.play()
                 Explosion(player)
@@ -485,30 +507,20 @@ def main(winstyle = 0):
                 #player.kill()
                 lives-=1
 
+            #Player collecting health
             for health in pygame.sprite.spritecollide(player,healths,1):
                 #healthSound.play()
                 lives +=1
                 health.kill()
+                #play health up sound if interviews suggest it
 
-                #play health up sound
-
+            #Bombing home base
             for bomb in pygame.sprite.spritecollide(homeBase, bombs, 1):
                 boom_sound.play()
                 Explosion(homeBase)
                 Explosion(bomb)
-                print("Homebase was hit")
-                
-                print("Changing to windowed mode")
-
                 causeOfDeath = 1
-                screen.blit(background,(0,0))
-                pygame.time.wait(1000)
                 player.kill()
-
-                #introduction of lives into the game
-
-                #ToDo: Create a loseLife method which also shows remaining lives on the screen
-                lives-=1
 
             #Creation of this is to introduce new scoring methods, shooting a bomb is worth double points
             for shot in pygame.sprite.groupcollide(bombs, shots, 1, 1).keys():
