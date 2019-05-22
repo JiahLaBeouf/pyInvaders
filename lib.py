@@ -347,6 +347,9 @@ def main(winstyle = 0):
         score = 0
 
         #Init starting sprites (or 'living sprites')
+        #adding the homebase, passes in the screen so it can determine it's staring position.
+        homeBase = HomeBase(screenRect)
+        #player after homebase so it goes in front
         player = Player(screenRect)
         Alien(screenRect) #this 'lives' because it goes into a sprite group
 
@@ -356,8 +359,7 @@ def main(winstyle = 0):
             all.add(Lives(lives))
             all.add(Timer(inGameTime))
 
-        #adding the homebase, passes in the screen so it can determine it's staring position.
-        homeBase = HomeBase(screenRect)
+        
 
         #This has the potential to be proportional to the score if more challenge is required
         maxShots = 4
