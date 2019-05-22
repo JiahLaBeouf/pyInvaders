@@ -97,7 +97,6 @@ def main(winstyle = 0):
     screen = pygame.display.set_mode(screenRect.size, winstyle, bestdepth)
     white = (255,255,255)
     green = (23, 255, 15)
-    
 
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
@@ -108,15 +107,11 @@ def main(winstyle = 0):
     Bomb.images = [load_image('bomb.gif')]
     Shot.images = [load_image('shot.png')]
     Health.images = [load_image('health.png')]
-    
-
-    #SelectableShip.images = load_image("shipRainbow.gif")
 
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
     pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.1)')
-    
 
     #create the background, tile the bgd image
     bgdtile = load_image('hubbleimage.png')
@@ -169,6 +164,7 @@ def main(winstyle = 0):
         
         shipType = 0
 
+
         notClicked = True
         while (notClicked):
             for event in pygame.event.get():
@@ -203,6 +199,38 @@ def main(winstyle = 0):
                         sys.exit(0)
                         raise SystemExit
                         return
+
+        clearScreenBG(screen,background)
+
+        easy = placeImage("easy.gif",226,200,screen)
+        printText(228,205,"Easy",screen,white)
+
+        medium = placeImage("medium.gif",352,200,screen)
+        printCText(205,"Medium",screen,white)
+
+        hard = placeImage("hard.gif",478,200,screen)
+        printText(480,205,"Hard",screen,white)
+
+        difficulty = None
+
+        difficultyChoice = True
+        while (difficultyChoice):
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                # Set the x, y postions of the mouse click
+                    x, y = event.pos
+                    
+                    if 226<=x<=(226+96) and 200<=y<=(200+60):
+                        difficulty = 0
+                        difficultyChoice = False
+                    elif 352 <= x <= (352+96) and 200<=y<=(200+60):
+                        difficulty = 1
+                        difficultyChoice = False
+                    elif 478<=x<=(478+96) and 200<=y<=(200+60):
+                        difficulty = 2
+                        difficultyChoice = False
+
+        #This is where the difficulty selector should go
 
         sc1 = load_image("controls.gif")
 
@@ -294,10 +322,29 @@ def main(winstyle = 0):
 
 
             #adding increasing difficulty
-            alienReload = round(6/((inGameTime/10)+0.001))
-            if inGameTime<=10:
-                alienReload = 6
-            print(alienReload)
+            #
+            
+            if difficulty == 0:
+                if inGameTime<=10:
+                    alienReload = 7
+                
+            elif difficulty == 1:
+                if inGameTime<=10:
+                    alienReload = 6
+                elif 10<=inGameTime<=120:
+                    alienReload = round(6/((inGameTime/10)+0.001))
+                else:
+                    alienReload = 2
+            elif difficulty == 2:
+                if inGameTime<=10:
+                    alienReload = 6
+                elif 10<=inGameTime<=70:
+                    alienReload = round(6/(inGameTime/6)+0.01)
+                else:
+                    alienReload = 1
+
+            #print(alienReload)
+
 
             #printSCText(20,str(inGameTime),screen,white,50)
 
@@ -477,23 +524,6 @@ def main(winstyle = 0):
 
         printCText(60,"You scored "+str(score)+" points!",screen, white)
 
-        # text_entry = ''
-
-        # error = False
-    
-        # while True:
-        #     for event in pygame.event.get():
-        #         if event.type == QUIT:
-        #             pygame.quit()
-        #             sys.exit()
-        #         if event.type == KEYDOWN:
-        #             if event.key == K_BACKSPACE:
-        #                 text_entry = text_entry[:-1]
-        #             elif event.key == K_RETURN:
-        #                 pass
-        #             else:
-        #                 text_entry += event.unicode
-
         
         if causeOfDeath == 1:
             msg1 = "Cause of death: Homebase was destroyed!"
@@ -506,6 +536,8 @@ def main(winstyle = 0):
         printCText(120,msg1,screen,white)
         
         pygame.mouse.set_visible(1)
+
+        
 
         replay = True
         while replay == True:
