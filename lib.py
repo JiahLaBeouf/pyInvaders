@@ -300,7 +300,7 @@ def main(winstyle = 0):
         #The mouse is now set invisible so that there is no interruption to gameplay
         pygame.mouse.set_visible(0)
 
-        img = loadImage('base.gif')
+        img = loadImage('base1.gif')
         HomeBase.images = [img,pygame.transform.flip(img,1,0)]
 
         #The ship is now loaded based on earlier preference from the start menu.
