@@ -626,6 +626,7 @@ def main(winstyle = 0):
                 elif event.type == KEYDOWN:
                     if event.key == K_BACKSPACE:
                         textEntry = textEntry[:-1]
+                        placeImage("textBG.gif",400,200,screen)
                     elif event.key == K_RETURN:
                         pass
                     else:
