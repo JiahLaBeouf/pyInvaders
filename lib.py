@@ -625,7 +625,7 @@ def main(winstyle = 0):
                         replay = False
                 elif event.type == KEYDOWN:
                     if event.key == K_BACKSPACE:
-                        textEntry = text_entry[:-1]
+                        textEntry = textEntry[:-1]
                     elif event.key == K_RETURN:
                         pass
                     else:
