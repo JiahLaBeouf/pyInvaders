@@ -285,7 +285,8 @@ def main(winstyle = 0):
         while not clicked:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                
+                    clicked = True
+                elif (event.type == KEYDOWN and event.key == K_SPACE):
                     clicked = True
 
 
