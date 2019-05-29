@@ -19,6 +19,7 @@ ALIEN_ODDS     = 10     #chances a new alien appears
 BOMB_ODDS      = 20    #chances a new bomb will drop
 ALIEN_RELOAD   = 6     #frames between new aliens
 
+#These classes are in the lib file because they have in game update dependencies. If I was more familiar with python this would be different
 class Score(pygame.sprite.Sprite):
     #score = None
     def __init__(self,score):
@@ -108,10 +109,13 @@ def main(winstyle = 0):
     Shot.images = [loadImage('shot.png')]
     Health.images = [loadImage('health.gif')]
 
+    img = loadImage('base1.gif')
+    HomeBase.images = [img,pygame.transform.flip(img,1,0)]    
+
     #decorate the game window
     icon = pygame.transform.scale(Alien.images[0], (32, 32))
     pygame.display.set_icon(icon)
-    pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.1)')
+    pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.2)')
 
     #create the background, tile the bgd image
     bgdtile = loadImage('hubbleimage.png')
@@ -165,6 +169,7 @@ def main(winstyle = 0):
         
         shipType = 0
 
+        #This is for the leaderboard. It is in the main loop so it works when replays occur
         names = []
         scores = []
         tFile = open("leaderboard.txt",'r+')
@@ -185,18 +190,14 @@ def main(winstyle = 0):
 
         n = len(scores)
 
+        #Simple bubble sort
         for i in range(n):
-         
-            # Last i elements are already in place
             for j in range(0, n-i-1):
-     
-                # traverse the array from 0 to n-i-1
-                # Swap if the element found is greater
-                # than the next element
                 if scores[j] < scores[j+1] :
                     scores[j], scores[j+1] = scores[j+1], scores[j]
                     names[j],names[j+1]=names[j+1],names[j]
 
+        #Prints the top 3 scores on the list.
         msgLB1 = names[0]+": "+str(scores[0])
         msgLB2 = names[1]+": "+str(scores[1])
         msgLB3 = names[2]+": "+str(scores[2])
@@ -206,26 +207,20 @@ def main(winstyle = 0):
         printSCText(390,msgLB2,screen,white,30)
         printSCText(420,msgLB3,screen,white,30)
 
+        #This loop is for the main menu
         notClicked = True
         while (notClicked):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                # Set the x, y postions of the mouse click
+                    
+                    # Set the x, y postions of the mouse click
                     x, y = event.pos
-                    #mpos = pygame.mouse.get_pos()
-                    #print(x,y,xRShip,(xRShip+rainbowShip.get_width()),yRShip,(yRShip+rainbowShip.get_height()))
+
                     if title.get_rect().collidepoint(x, y):
                         #idk what to do with this one atm but maybe this will launch the github project?
                         webbrowser.open_new("https://github.com/JiahLaBeouf/pyInvaders")
 
-                        #notClicked = False
-
-                    #why does this not work???
-                    # if rainbowShip.get_rect().collidepoint(x,y):
-                    #     print("clicked on ship")
-                    #     notClicked = False
-
-                    #Why the  does this work and not the collidepoint?
+                    #Checks for the ships being clicked on
                     if xRShip<=x<=(xRShip+rainbowShip.get_width()) and sY<=y<=(sY+rainbowShip.get_height()):
                         shipType = 1
                         notClicked = False
@@ -287,6 +282,7 @@ def main(winstyle = 0):
         clearScreenBG(screen,sc1)
 
         #This is the controls screen, which waits for a click anywhere, hence no collide methods.
+        #This could also go with a spacebar press if time allows
         clicked = False
         while not clicked:
             for event in pygame.event.get():
@@ -300,8 +296,6 @@ def main(winstyle = 0):
         #The mouse is now set invisible so that there is no interruption to gameplay
         pygame.mouse.set_visible(0)
 
-        img = loadImage('base1.gif')
-        HomeBase.images = [img,pygame.transform.flip(img,1,0)]
 
         #The ship is now loaded based on earlier preference from the start menu.
         if shipType == 0:
@@ -374,6 +368,7 @@ def main(winstyle = 0):
         #This loop is essentially the gameplay loop. It ends whenever the player is killed
         while player.alive():
 
+            #Used to determine difficulty and could potentially be used to determine powerup lengths
             inGameTime = round(((pygame.time.get_ticks()) - startTime)/1000)
 
 
@@ -464,6 +459,7 @@ def main(winstyle = 0):
 
             # Create new alien
 
+            #The formula for the odds logic, essentially rounds a random number to 0 or 1
             odds = int(random.random() * ALIEN_ODDS)
 
             if framesPerAlien>=0:
@@ -542,6 +538,7 @@ def main(winstyle = 0):
                 causeOfDeath = 2
                 player.kill()
 
+            #This is for manual game end without dying from bombs or aliens
             if keystate[K_k]:
                 screen.blit(background,(0,0))
                 pygame.display.flip()
@@ -558,6 +555,7 @@ def main(winstyle = 0):
             clock.tick(40)
 
         #THIS is where the endgame goes
+        #Blanks the screen and then adds all buttons and items to the screen
         print("about to set to black")
         screen.fill((0,0,0))
         screen.blit(background, (0,0))
@@ -583,6 +581,7 @@ def main(winstyle = 0):
             msg1 = "unknown cause of death"
         printCText(120,msg1,screen,white)
         
+        #Sets the mouse to visible so it can be seen in the menus
         pygame.mouse.set_visible(1)
 
         textEntry = ''
@@ -623,6 +622,7 @@ def main(winstyle = 0):
 
                     elif collideP(325,300,menuButton,x,y):
                         replay = False
+                #Text entry code (keylogger)
                 elif event.type == KEYDOWN:
                     if event.key == K_BACKSPACE:
                         textEntry = textEntry[:-1]
@@ -632,12 +632,13 @@ def main(winstyle = 0):
                     else:
                         textEntry += event.unicode
 
+        #Writes the name and score to the leaderboard file.
         nameW = str(textEntry)
-
         tFile.write("\n"+nameW+"|"+str(score))
 
 
 
+    #End logic, fades music and quits pygame
     if pygame.mixer:
         pygame.mixer.music.fadeout(1000)
     pygame.time.wait(1000)

@@ -13,24 +13,6 @@ if not pygame.image.get_extended():
 
 #call the "main" function if running this script
 
-#Welcome to PyInvaders version 1.1
+#Welcome to PyInvaders version 1.2
 
 main()
-
-# Some To Dos:
-#     Make sure to create the startup menu, to do a few things:
-#         1. pick which ship the player wants to play with (which inevitably starts the game)
-#         2. has a credits section
-#         3. leaderboard?
-#     End game section:
-#         1. links back to start menu or
-#         2. has an exit button which exits the game
-
-# Tasks for 15/05:
-#     new graphics for all buttons
-#     populate menus (starting + ending)
-#     new graphics for aliens, bullets, bombs, homebase
-#     create a health powerup? (basically copy bombs but for different purposes)
-#     create installation guide and user manual
-#     create survey
-#     create local leaderboard file and file system (work out pygame inputs)

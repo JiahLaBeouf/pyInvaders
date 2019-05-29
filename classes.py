@@ -7,7 +7,7 @@ import lib
 from lib import *
 
 class Player(pygame.sprite.Sprite):
-    speed = 15
+    speed = 14
     bounce = 24
     gun_offset = 0
     images = []
@@ -41,6 +41,8 @@ class HomeBase(pygame.sprite.Sprite):
     gun_offset = 0
     images = []
     sr = None
+
+    #Takes the input of the screen rect object to pass through, so the screen size can be dynamic
     def __init__(self,scrt):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.image = self.images[0]
