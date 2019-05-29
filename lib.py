@@ -112,12 +112,12 @@ def main(winstyle = 0):
     img = loadImage('base1.gif')
     HomeBase.images = [img,pygame.transform.flip(img,1,0)]    
 
-    #decorate the game window
-    icon = pygame.transform.scale(Alien.images[0], (32, 32))
+    #decorate the game window, makes app icon the rainbow ship image
+    icon = pygame.transform.scale(loadImage("shipRainbow.gif"), (32, 32))
     pygame.display.set_icon(icon)
     pygame.display.set_caption('Jiah Presents: PyInvaders! (V1.2)')
 
-    #create the background, tile the bgd image
+    #create the background and tile the background image
     bgdtile = loadImage('hubbleimage.png')
     background = pygame.Surface(screenRect.size)
     for x in range(0, screenRect.width, bgdtile.get_width()):
@@ -136,10 +136,9 @@ def main(winstyle = 0):
 
     playing = True
 
-    tFile = open("leaderboard.txt",'r+')
+    tFile = open("leaderboard.txt",'r+') 
 
-    
-
+    #Application loop, this only ends once the application is closed.
     while playing:
         clearScreenBG(screen,background)
 
@@ -178,11 +177,10 @@ def main(winstyle = 0):
         i=int(0)
         ender = len(list)-1
         while iterator:
-            name,scorez = list.pop(0).split("|")
+            name,scorez = list.pop(0).split("|") #"scorez" is used because both scores and score are in use
             names.append(name)
             scores.append(int(scorez))
             i = i+1
-            #print(i)
             if i>ender:
                 iterator = False
             else:
@@ -409,7 +407,7 @@ def main(winstyle = 0):
                 elif event.type == KEYDOWN:
                     if event.key == pygame.K_f:
                         if not fullscreen:
-                            print("Changing to FULLSCREEN")
+                            #print("Changing to FULLSCREEN")
                             screen_backup = screen.copy()
                             screen = pygame.display.set_mode(
                                 screenRect.size,
@@ -418,7 +416,7 @@ def main(winstyle = 0):
                             )
                             screen.blit(screen_backup, (0, 0))
                         else:
-                            print("Changing to windowed mode")
+                            #print("Changing to windowed mode")
                             screen_backup = screen.copy()
                             screen = pygame.display.set_mode(
                                 screenRect.size,
@@ -556,12 +554,12 @@ def main(winstyle = 0):
 
         #THIS is where the endgame goes
         #Blanks the screen and then adds all buttons and items to the screen
-        print("about to set to black")
+        #print("about to set to black")
         screen.fill((0,0,0))
         screen.blit(background, (0,0))
         pygame.display.flip()
         #pygame.display.update()
-        print("we've blitted the screen now")
+        #print("we've blitted the screen now")
 
         menuButton = placeImage("mainMenu.gif",325,300,screen)
         printSCText(310,"Main Menu",screen,white,40)
